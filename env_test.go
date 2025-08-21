@@ -172,21 +172,20 @@ func TestGetStringSlice(t *testing.T) {
 		assert.Equal(t, expected, result)
 	})
 
+	t.Run("When the key exists but is empty", func(t *testing.T) {
+		key, value := "KEY", ""
+		t.Setenv(key, value)
+
+		result := GetStringSlice(key, nil)
+
+		assert.Nil(t, result)
+	})
+
 	t.Run("When the key does not exist", func(t *testing.T) {
 		key, defaultValue := "KEY", []string{"DEFAULT"}
 		expected := defaultValue
 
 		result := GetStringSlice(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is empty", func(t *testing.T) {
-		key, value := "KEY", ""
-		expected := []string{""}
-		t.Setenv(key, value)
-
-		result := GetStringSlice(key, nil)
 
 		assert.Equal(t, expected, result)
 	})
