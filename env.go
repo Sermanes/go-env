@@ -73,7 +73,7 @@ func GetBytes(key string, defaultValue []byte) []byte {
 
 func GetStringSlice(key string, defaultValue []string) []string {
 	value, exists := os.LookupEnv(key)
-	if !exists {
+	if !exists || value == "" {
 		return defaultValue
 	}
 
