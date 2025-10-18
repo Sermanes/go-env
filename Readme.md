@@ -68,5 +68,11 @@ Get a signed 64-bit integer environment variable with a default value.
 value := env.GetInt64("KEY", 0)
 ```
 
+#### Signed Integers (`int`)
+Get a signed integer environment variable with a default value.
+```go
+value := env.GetInt("KEY", 0)
+```
+
 ## Contributing
 Contributions are welcome. Please submit pull requests with detailed explanations of changes.
