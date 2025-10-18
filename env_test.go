@@ -253,3 +253,34 @@ func TestGetInt64(t *testing.T) {
 		assert.Equal(t, expected, result)
 	})
 }
+
+func TestGetInt(t *testing.T) {
+	t.Run("When the key exists", func(t *testing.T) {
+		key, value := "KEY", "10"
+		expected := 10
+		t.Setenv(key, value)
+
+		result := GetInt(key, 0)
+
+		assert.Equal(t, expected, result)
+	})
+
+	t.Run("When the key does not exist", func(t *testing.T) {
+		key, defaultValue := "KEY", 0
+		expected := defaultValue
+
+		result := GetInt(key, defaultValue)
+
+		assert.Equal(t, expected, result)
+	})
+
+	t.Run("When the key exists but is not a number", func(t *testing.T) {
+		key, value := "KEY", "VALUE"
+		expected := 0
+		t.Setenv(key, value)
+
+		result := GetInt(key, 0)
+
+		assert.Equal(t, expected, result)
+	})
+}

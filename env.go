@@ -107,3 +107,17 @@ func GetInt64(key string, defaultValue int64) int64 {
 
 	return number
 }
+
+func GetInt(key string, defaultValue int) int {
+	value, exist := os.LookupEnv(key)
+	if !exist {
+		return defaultValue
+	}
+
+	number, err := strconv.Atoi(value)
+	if err != nil {
+		return defaultValue
+	}
+
+	return number
+}
