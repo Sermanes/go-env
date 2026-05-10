@@ -47,7 +47,7 @@ jobs:
           path: coverage.out
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.1.6
+          version: v2.12.2
           args: --config .golangci.yml --timeout=5m
