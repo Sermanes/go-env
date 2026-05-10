@@ -58,7 +58,6 @@ Loaded before any agent acts on this repository. Applies to every session.
 Only touch when the user explicitly asks:
 - `Makefile`
 - `.golangci.yml`
-- `linting.toml`
 - `.github/workflows/*`
 - `scripts/hooks/*`
 - `.pre-commit-config.yaml`

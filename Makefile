@@ -13,7 +13,7 @@ COVERAGE_HTML = coverage.html
 
 .PHONY: all clean \
         test test-race test-coverage bench \
-        fmt vet lint lint-revive \
+        fmt vet lint \
         tidy ci before-push \
         install-tools install-hooks \
         help
@@ -51,9 +51,6 @@ vet: ## Run go vet
 lint: ## Run golangci-lint (full suite)
 	golangci-lint run --config .golangci.yml ./...
 
-lint-revive: ## Run revive linter only
-	revive -formatter stylish -config linting.toml ./...
-
 tidy: ## Tidy and verify go.mod / go.sum
 	$(GOMOD) tidy
 	$(GOMOD) verify
@@ -65,7 +62,6 @@ before-push: fmt vet test test-race lint ## Gate to run before every git push
 
 ## ─── Tooling ──────────────────────────────────────────────────────────────────
 install-tools: ## Install all required developer tools
-	$(GOCMD) install github.com/mgechev/revive@latest
 	$(GOCMD) install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 	$(GOCMD) install golang.org/x/tools/cmd/goimports@latest
 

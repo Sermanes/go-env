@@ -36,7 +36,88 @@ linters:
 
   settings:
     revive:
-      config: linting.toml
+      severity: warning
+      enable-all-rules: false
+      rules:
+        - name: add-constant
+          arguments:
+            - maxLitCount: "5"
+              allowStrs: '"*"'
+              allowInts: "*"
+              allowFloats: "*"
+              ignoreFuncs: 'os\.*,fmt\.Println,make'
+          severity: warning
+        - name: argument-limit
+          arguments: [5]
+          severity: warning
+        - name: atomic
+          severity: warning
+        - name: bare-return
+          severity: warning
+        - name: blank-imports
+          severity: error
+        - name: bool-literal-in-expr
+          severity: warning
+        - name: call-to-gc
+          severity: error
+        - name: cognitive-complexity
+          arguments: [12]
+          severity: error
+        - name: comment-spacings
+          severity: warning
+        - name: confusing-naming
+          severity: warning
+        - name: confusing-results
+          severity: warning
+        - name: constant-logical-expr
+          severity: error
+        - name: context-as-argument
+          severity: warning
+        - name: context-keys-type
+          severity: warning
+        - name: cyclomatic
+          arguments: [12]
+          severity: warning
+        - name: datarace
+          severity: error
+        - name: deep-exit
+          severity: warning
+        - name: defer
+          severity: warning
+        - name: dot-imports
+          severity: error
+        - name: duplicated-imports
+          severity: error
+        - name: early-return
+          severity: warning
+        - name: empty-block
+          severity: error
+        - name: empty-lines
+          arguments: [2]
+          severity: warning
+        - name: enforce-map-style
+          severity: warning
+        - name: enforce-slice-style
+          severity: warning
+        - name: error-naming
+          arguments: ['^Err[A-Z]']
+          severity: warning
+        - name: error-return
+          severity: error
+        - name: error-strings
+          severity: warning
+        - name: errorf
+          severity: warning
+        - name: flag-parameter
+          severity: warning
+        - name: function-length
+          arguments: [20, 40]
+          severity: warning
+        - name: function-result-limit
+          arguments: [3]
+        - name: line-length-limit
+          arguments: [150]
+        - name: unchecked-type-assertion
 
     gocritic:
       enabled-tags:
@@ -66,6 +147,7 @@ linters:
           - gosec
           - bodyclose
           - noctx
+          - revive
 
 ## ─── Formatters ───────────────────────────────────────────────────────────────
 formatters:
