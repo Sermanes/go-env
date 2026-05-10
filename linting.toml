@@ -123,12 +123,3 @@ exclude = ["**/*_test.go"]
 
 [rule.unchecked-type-assertion]
 exclude = ["**/*_test.go"]
-
-[rule.exported]
-disabled = true
-
-[rule.package-comments]
-disabled = true
-
-[rule.redefines-builtin-id]
-disabled = true
