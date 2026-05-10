@@ -2,284 +2,474 @@ package env
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGet(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := value
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := Get(key, "")
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue string
+		expected     string
+	}{
+		{"when the key exists", true, "VALUE", "", "VALUE"},
+		{"when the key does not exist", false, "", "DEFAULT", "DEFAULT"},
+		{"when the key exists but is empty", true, "", "", ""},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", "DEFAULT"
-		expected := defaultValue
+			result := Get(key, tc.defaultValue)
 
-		result := Get(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is empty", func(t *testing.T) {
-		key, value := "KEY", ""
-		expected := value
-		t.Setenv(key, value)
-
-		result := Get(key, "")
-
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetUint(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "10"
-		expected := uint(10)
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetUint(key, 0)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue uint
+		expected     uint
+	}{
+		{"when the key exists", true, "10", 0, 10},
+		{"when the key does not exist", false, "", 0, 0},
+		{"when the value is not a number", true, "VALUE", 0, 0},
+		{"when the value is negative", true, "-1", 7, 7},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", uint(0)
-		expected := defaultValue
+			result := GetUint(key, tc.defaultValue)
 
-		result := GetUint(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is not a number", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := uint(0)
-		t.Setenv(key, value)
-
-		result := GetUint(key, 0)
-
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetUint8(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "10"
-		expected := uint8(10)
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetUint8(key, 0)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue uint8
+		expected     uint8
+	}{
+		{"when the key exists", true, "10", 0, 10},
+		{"when the key does not exist", false, "", 0, 0},
+		{"when the value is not a number", true, "VALUE", 0, 0},
+		{"when the value overflows uint8", true, "300", 7, 7},
+		{"when the value is negative", true, "-1", 7, 7},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", uint8(0)
-		expected := defaultValue
+			result := GetUint8(key, tc.defaultValue)
 
-		result := GetUint8(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is not a number", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := uint8(0)
-		t.Setenv(key, value)
-
-		result := GetUint8(key, 0)
-
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetBool(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "true"
-		expected := true
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetBool(key, false)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue bool
+		expected     bool
+	}{
+		{"when the key exists", true, "true", false, true},
+		{"when the key does not exist", false, "", false, false},
+		{"when the value is not a boolean", true, "VALUE", false, false},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", false
-		expected := defaultValue
+			result := GetBool(key, tc.defaultValue)
 
-		result := GetBool(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is not a boolean", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := false
-		t.Setenv(key, value)
-
-		result := GetBool(key, false)
-
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetBytes(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := []byte(value)
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetBytes(key, nil)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue []byte
+		expected     []byte
+	}{
+		{"when the key exists", true, "VALUE", nil, []byte("VALUE")},
+		{"when the key does not exist", false, "", []byte("DEFAULT"), []byte("DEFAULT")},
+		{"when the key exists but is empty", true, "", nil, []byte("")},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", []byte("DEFAULT")
-		expected := defaultValue
+			result := GetBytes(key, tc.defaultValue)
 
-		result := GetBytes(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is empty", func(t *testing.T) {
-		key, value := "KEY", ""
-		expected := []byte(value)
-		t.Setenv(key, value)
-
-		result := GetBytes(key, nil)
-
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetStringSlice(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "value1,value2,value3"
-		expected := []string{"value1", "value2", "value3"}
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetStringSlice(key, nil)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue []string
+		expected     []string
+	}{
+		{"when the key exists", true, "value1,value2,value3", nil, []string{"value1", "value2", "value3"}},
+		{"when the key exists but is empty", true, "", nil, nil},
+		{"when the key does not exist", false, "", []string{"DEFAULT"}, []string{"DEFAULT"}},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key exists but is empty", func(t *testing.T) {
-		key, value := "KEY", ""
-		t.Setenv(key, value)
+			result := GetStringSlice(key, tc.defaultValue)
 
-		result := GetStringSlice(key, nil)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
 
-		assert.Nil(t, result)
-	})
+func TestGetStringSliceWithSep(t *testing.T) {
+	const key = "KEY"
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", []string{"DEFAULT"}
-		expected := defaultValue
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		separator    string
+		defaultValue []string
+		expected     []string
+	}{
+		{"when the key exists with comma separator", true, "a,b,c", ",", nil, []string{"a", "b", "c"}},
+		{"when the key exists with semicolon separator", true, "a;b;c", ";", nil, []string{"a", "b", "c"}},
+		{"when the items have surrounding whitespace", true, " a , b ,c ", ",", nil, []string{"a", "b", "c"}},
+		{"when the key has a single item", true, "only", ",", nil, []string{"only"}},
+		{"when the key does not exist", false, "", ",", []string{"DEFAULT"}, []string{"DEFAULT"}},
+		{"when the key exists but is empty", true, "", ",", []string{"DEFAULT"}, []string{"DEFAULT"}},
+		{"when the separator is multi-char", true, "a||b||c", "||", nil, []string{"a", "b", "c"}},
+	}
 
-		result := GetStringSlice(key, defaultValue)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-		assert.Equal(t, expected, result)
-	})
+			result := GetStringSliceWithSep(key, tc.defaultValue, tc.separator)
+
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetFloat64(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "10.5"
-		expected := 10.5
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetFloat64(key, 0)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue float64
+		expected     float64
+	}{
+		{"when the key exists", true, "10.5", 0, 10.5},
+		{"when the key does not exist", false, "", 0, 0},
+		{"when the value is not a number", true, "VALUE", 0, 0},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", 0.0
-		expected := defaultValue
+			result := GetFloat64(key, tc.defaultValue)
 
-		result := GetFloat64(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is not a number", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := 0.0
-		t.Setenv(key, value)
-
-		result := GetFloat64(key, 0)
-
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetInt64(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "10"
-		expected := int64(10)
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetInt64(key, 0)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue int64
+		expected     int64
+	}{
+		{"when the key exists", true, "10", 0, 10},
+		{"when the key exists with negative", true, "-10", 0, -10},
+		{"when the key does not exist", false, "", 0, 0},
+		{"when the value is not a number", true, "VALUE", 0, 0},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", int64(0)
-		expected := defaultValue
+			result := GetInt64(key, tc.defaultValue)
 
-		result := GetInt64(key, defaultValue)
-
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("When the key exists but is not a number", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := int64(0)
-		t.Setenv(key, value)
-
-		result := GetInt64(key, 0)
-
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
 
 func TestGetInt(t *testing.T) {
-	t.Run("When the key exists", func(t *testing.T) {
-		key, value := "KEY", "10"
-		expected := 10
-		t.Setenv(key, value)
+	const key = "KEY"
 
-		result := GetInt(key, 0)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue int
+		expected     int
+	}{
+		{"when the key exists", true, "10", 0, 10},
+		{"when the key exists with negative", true, "-10", 0, -10},
+		{"when the key does not exist", false, "", 0, 0},
+		{"when the value is not a number", true, "VALUE", 0, 0},
+	}
 
-		assert.Equal(t, expected, result)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-	t.Run("When the key does not exist", func(t *testing.T) {
-		key, defaultValue := "KEY", 0
-		expected := defaultValue
+			result := GetInt(key, tc.defaultValue)
 
-		result := GetInt(key, defaultValue)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
 
-		assert.Equal(t, expected, result)
-	})
+func TestGetInt32(t *testing.T) {
+	const key = "KEY"
 
-	t.Run("When the key exists but is not a number", func(t *testing.T) {
-		key, value := "KEY", "VALUE"
-		expected := 0
-		t.Setenv(key, value)
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue int32
+		expected     int32
+	}{
+		{"when the key exists", true, "10", 0, 10},
+		{"when the key exists with negative", true, "-10", 0, -10},
+		{"when the key does not exist", false, "", 7, 7},
+		{"when the value is not a number", true, "VALUE", 7, 7},
+		{"when the value overflows int32", true, "9999999999", 7, 7},
+	}
 
-		result := GetInt(key, 0)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
 
-		assert.Equal(t, expected, result)
-	})
+			result := GetInt32(key, tc.defaultValue)
+
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestGetUint16(t *testing.T) {
+	const key = "KEY"
+
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue uint16
+		expected     uint16
+	}{
+		{"when the key exists", true, "1024", 0, 1024},
+		{"when the key does not exist", false, "", 7, 7},
+		{"when the value is not a number", true, "VALUE", 7, 7},
+		{"when the value is negative", true, "-1", 7, 7},
+		{"when the value overflows uint16", true, "70000", 7, 7},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
+
+			result := GetUint16(key, tc.defaultValue)
+
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestGetUint32(t *testing.T) {
+	const key = "KEY"
+
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue uint32
+		expected     uint32
+	}{
+		{"when the key exists", true, "65536", 0, 65536},
+		{"when the key does not exist", false, "", 7, 7},
+		{"when the value is not a number", true, "VALUE", 7, 7},
+		{"when the value is negative", true, "-1", 7, 7},
+		{"when the value overflows uint32", true, "9999999999", 7, 7},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
+
+			result := GetUint32(key, tc.defaultValue)
+
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestGetUint64(t *testing.T) {
+	const key = "KEY"
+
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue uint64
+		expected     uint64
+	}{
+		{"when the key exists", true, "9999999999", 0, 9999999999},
+		{"when the key does not exist", false, "", 7, 7},
+		{"when the value is not a number", true, "VALUE", 7, 7},
+		{"when the value is negative", true, "-1", 7, 7},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
+
+			result := GetUint64(key, tc.defaultValue)
+
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestGetFloat32(t *testing.T) {
+	const key = "KEY"
+
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue float32
+		expected     float32
+	}{
+		{"when the key exists", true, "3.14", 0, 3.14},
+		{"when the key does not exist", false, "", 1.5, 1.5},
+		{"when the value is not a number", true, "VALUE", 1.5, 1.5},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
+
+			result := GetFloat32(key, tc.defaultValue)
+
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestGetDuration(t *testing.T) {
+	const key = "KEY"
+
+	tests := []struct {
+		name         string
+		setEnv       bool
+		value        string
+		defaultValue time.Duration
+		expected     time.Duration
+	}{
+		{"when the key exists with seconds", true, "5s", 0, 5 * time.Second},
+		{"when the key exists with mixed units", true, "1h30m", 0, 90 * time.Minute},
+		{"when the key does not exist", false, "", time.Minute, time.Minute},
+		{"when the value is not a duration", true, "VALUE", time.Minute, time.Minute},
+		{"when the value lacks units", true, "10", time.Minute, time.Minute},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.setEnv {
+				t.Setenv(key, tc.value)
+			}
+
+			result := GetDuration(key, tc.defaultValue)
+
+			assert.Equal(t, tc.expected, result)
+		})
+	}
 }
