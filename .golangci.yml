@@ -1,0 +1,86 @@
+## golangci-lint v2 configuration
+## Docs: https://golangci-lint.run/usage/configuration/
+
+version: "2"
+
+run:
+  timeout: 5m
+  go: "1.26"
+  modules-download-mode: readonly
+
+## ─── Linters ──────────────────────────────────────────────────────────────────
+linters:
+  default: none
+  enable:
+    # Correctness
+    - errcheck
+    - govet
+    - staticcheck
+    - ineffassign
+
+    # Style / idiomatic Go
+    - misspell
+    - godot
+    - whitespace
+
+    # Bugs & security
+    - gosec
+    - bodyclose
+    - noctx
+
+    # Performance
+    - prealloc
+
+    - gocritic
+    - revive
+
+  settings:
+    revive:
+      config: linting.toml
+
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+      disabled-checks:
+        - hugeParam
+        - rangeValCopy
+        - exitAfterDefer
+        - importShadow
+        - httpNoBody
+        - sprintfQuotedString
+
+    godot:
+      scope: declarations
+      capital: false
+
+    misspell:
+      locale: US
+
+  exclusions:
+    rules:
+      - path: "_test\\.go"
+        linters:
+          - errcheck
+          - gosec
+          - bodyclose
+          - noctx
+
+## ─── Formatters ───────────────────────────────────────────────────────────────
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/Sermanes/go-env
+
+## ─── Output ───────────────────────────────────────────────────────────────────
+output:
+  formats:
+    text:
+      path: stdout
+  show-stats: true

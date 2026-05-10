@@ -1,0 +1,41 @@
+# .pre-commit-config.yaml
+# Framework: https://pre-commit.com/
+#
+# Install the framework:  pip install pre-commit
+# Activate for this repo: pre-commit install --hook-type pre-commit --hook-type pre-push
+# Run manually:           pre-commit run --all-files
+
+repos:
+  ## ── Go formatting & vetting ─────────────────────────────────────────────────
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+        name: gofmt
+      - id: go-vet
+        name: go vet
+      - id: go-mod-tidy
+        name: go mod tidy
+      - id: go-unit-tests
+        name: go test (short)
+        args: ["-v", "-failfast", "-short"]
+
+  ## ── golangci-lint ────────────────────────────────────────────────────────────
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.1.6
+    hooks:
+      - id: golangci-lint
+        args: ["--config", ".golangci.yml"]
+        stages: [pre-push]
+
+  ## ── Generic file hygiene ─────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: detect-private-key

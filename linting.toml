@@ -1,0 +1,134 @@
+# revive.toml - Configuración avanzada para Revive
+ignoreGeneratedHeader = false
+
+errorCode = 1
+warningCode = 0
+
+confidence = 0.8
+
+enableAllRules = false
+
+[rule.add-constant]
+arguments = [
+    { maxLitCount = "5", allowStrs = "*", allowInts = "*", allowFloats = "*", ignoreFuncs = "os\\.*,fmt\\.Println,make" },
+]
+exclude = ["**/_test.go"]
+severity = "warning"
+
+[rule.argument-limit]
+arguments = [5]
+severity = "warning"
+
+[rule.atomic]
+severity = "warning"
+
+[rule.bare-return]
+severity = "warning"
+
+[rule.blank-imports]
+severity = "error"
+
+[rule.bool-literal-in-expr]
+severity = "warning"
+
+[rule.call-to-gc]
+severity = "error"
+
+[rule.cognitive-complexity]
+arguments = [12]
+severity = "error"
+exclude = ["**/*_test.go"]
+
+[rule.comment-spacings]
+severity = "warning"
+
+[rule.confusing-naming]
+severity = "warning"
+
+[rule.confusing-results]
+severity = "warning"
+
+[rule.constant-logical-expr]
+severity = "error"
+
+[rule.context-as-argument]
+severity = "warning"
+
+[rule.context-keys-type]
+severity = "warning"
+
+[rule.cyclomatic]
+arguments = [12]
+severity = "warning"
+exclude = ["**/*_test.go"]
+
+[rule.datarace]
+severity = "error"
+
+[rule.deep-exit]
+severity = "warning"
+
+[rule.defer]
+severity = "warning"
+
+[rule.dot-imports]
+severity = "error"
+
+[rule.duplicated-imports]
+severity = "error"
+
+[rule.early-return]
+severity = "warning"
+
+[rule.empty-block]
+severity = "error"
+
+[rule.empty-lines]
+arguments = [2]
+severity = "warning"
+
+[rule.enforce-map-style]
+severity = "warning"
+
+[rule.enforce-slice-style]
+severity = "warning"
+
+[rule.error-naming]
+arguments = ["^Err[A-Z]"]
+severity = "warning"
+
+[rule.error-return]
+severity = "error"
+
+[rule.error-strings]
+severity = "warning"
+
+[rule.errorf]
+severity = "warning"
+
+[rule.flag-parameter]
+severity = "warning"
+
+[rule.function-length]
+arguments = [20, 40]
+severity = "warning"
+exclude = ["**/*_test.go"]
+
+[rule.function-result-limit]
+arguments = [3]
+
+[rule.line-length-limit]
+arguments = [150]
+exclude = ["**/*_test.go"]
+
+[rule.unchecked-type-assertion]
+exclude = ["**/*_test.go"]
+
+[rule.exported]
+disabled = true
+
+[rule.package-comments]
+disabled = true
+
+[rule.redefines-builtin-id]
+disabled = true

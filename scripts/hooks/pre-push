@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# pre-push – runs on every `git push`
+# Full gate: tests (with race detector) + golangci-lint
+set -euo pipefail
+
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+RESET='\033[0m'
+
+step() { echo -e "${YELLOW}[pre-push]${RESET} $*"; }
+ok()   { echo -e "${GREEN}[pre-push] ✓${RESET} $*"; }
+fail() { echo -e "${RED}[pre-push] ✗${RESET} $*" >&2; exit 1; }
+
+## ── 1. go mod verify ─────────────────────────────────────────────────────────
+step "go mod verify …"
+go mod verify || fail "go.sum is inconsistent – run: go mod tidy"
+ok "go mod verify"
+
+## ── 2. go vet ────────────────────────────────────────────────────────────────
+step "go vet ./... …"
+go vet ./... || fail "go vet reported issues."
+ok "go vet"
+
+## ── 3. Tests with race detector ──────────────────────────────────────────────
+step "go test -race ./... …"
+go clean -testcache
+go test -race -v -failfast -short ./... || fail "Tests failed."
+ok "Tests"
+
+## ── 4. golangci-lint (full run) ──────────────────────────────────────────────
+if command -v golangci-lint &>/dev/null; then
+  step "golangci-lint (full) …"
+  golangci-lint run --config .golangci.yml ./... || fail "golangci-lint reported issues."
+  ok "golangci-lint"
+else
+  step "golangci-lint not found – skipping (run: make install-tools)"
+fi
+
+echo -e "${GREEN}[pre-push] All checks passed – push allowed.${RESET}"
